@@ -3,6 +3,7 @@ package auth
 import (
 	"fmt"
 	"http-server/configs"
+	"http-server/pkg/res"
 	"net/http"
 )
 
@@ -27,6 +28,11 @@ func (handler *AuthHandler) Login() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(handler.Config.Auth.Secret)
 		fmt.Println("Login")
+
+		data := LoginResponse{
+			Token: "123",
+		}
+		res.Json(w, data, 200)
 	}
 
 }
