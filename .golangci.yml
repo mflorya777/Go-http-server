@@ -1,0 +1,105 @@
+run:
+  timeout: 3m
+  tests: true
+  modules-download-mode: readonly
+  allow-parallel-runners: true
+  concurrency: 4
+
+# Игнорируем директории, аналогично exclude в pyproject.toml
+skip-dirs:
+  - vendor
+  - node_modules
+  - build
+  - dist
+  - tmp
+  - .git
+  - .vscode
+  - .idea
+  - .cache
+
+# Основные линтеры
+linters:
+  enable:
+    # Базовые
+    - govet               # встроенный анализатор Go
+    - staticcheck         # мощный статический анализ
+    - ineffassign         # поиск неиспользуемых присваиваний
+    - gofmt               # проверка форматирования
+    - goimports           # проверка импортов
+    - errcheck            # неуправляемые ошибки
+    - gosimple            # упрощения кода
+    - deadcode            # мёртвый код
+    - typecheck           # проблемы типов
+    - unused              # неиспользуемые переменные и импорты
+
+    # Качество и стиль
+    - stylecheck          # проверка стиля кода (аналог flake8)
+    - revive              # расширенный линтер с множеством правил
+    - misspell            # орфографические ошибки в комментариях
+    - gofumpt             # строгий форматтер (улучшенный gofmt)
+    - unparam             # неиспользуемые параметры функций
+    - prealloc            # оптимизация срезов
+    - gocyclo             # сложность циклов
+    - nestif              # вложенные if
+    - goconst             # повторяющиеся строки/константы
+
+    # Безопасность
+    - gosec               # аналог bandit — поиск уязвимостей
+
+    # Архитектура и проектирование
+    - dupl                # дублирование кода
+    - exportloopref       # ссылки на переменные цикла
+    - nakedret            # неявные return'ы
+    - funlen              # длина функций
+    - cyclop              # цикломатическая сложность
+    - wsl                 # стиль и пустые строки (whitespace linter)
+
+linters-settings:
+  gofmt:
+    simplify: true
+  goimports:
+    local-prefixes: github.com/mflorya777/Go-http-server
+  gocyclo:
+    min-complexity: 15
+  funlen:
+    lines: 80
+    statements: 40
+  revive:
+    confidence: 0.8
+    error-code: 1
+    severity: warning
+  misspell:
+    locale: US
+  goconst:
+    min-occurrences: 3
+  gosec:
+    excludes:
+      - G104 # пропускаем ошибки без обработки, если явно допустимо
+  wsl:
+    strict-spacing: true
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  new: true
+
+  # Игнорируем тестовые файлы и сгенерированный код
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck
+        - dupl
+    - path: ".*_gen.go"
+      linters:
+        - gofmt
+        - goimports
+        - gosimple
+    - path: "vendor/"
+      linters:
+        - all
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
