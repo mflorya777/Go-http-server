@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"encoding/json"
 	"fmt"
 	"http-server/configs"
 	"http-server/pkg/res"
@@ -20,14 +21,31 @@ func NewAuthHandler(router *http.ServeMux, deps AuthHandlerDeps) {
 		Config: deps.Config,
 	}
 
-	router.HandleFunc("POST /auth/login", handler.Login())
-	router.HandleFunc("POST /auth/register", handler.Register())
+	router.HandleFunc("/auth/login", handler.Login())
+	router.HandleFunc("/auth/register", handler.Register())
 }
 
 func (handler *AuthHandler) Login() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(handler.Config.Auth.Secret)
 		fmt.Println("Login")
+
+		// Прочитать Body
+		var payload LoginRequest
+		err := json.NewDecoder(r.Body).Decode(&payload)
+		if err != nil {
+			res.Json(w, err.Error(), 402)
+			return
+		}
+		if payload.Email == "" {
+			res.Json(w, "Email required", 402)
+			return
+		}
+		if payload.Password == "" {
+			res.Json(w, "Password required", 402)
+			return
+		}
+		fmt.Println(payload)
 
 		data := LoginResponse{
 			Token: "123",
